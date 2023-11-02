@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -72,10 +71,9 @@ public class JobData {
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
 
         for (HashMap<String, String> row : allJobs) {
-
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            if (aValue != null && aValue.equalsIgnoreCase(value)) {
                 jobs.add(row);
             }
         }
@@ -94,8 +92,27 @@ public class JobData {
         // load data, if not already loaded
         loadData();
 
-        // TODO - implement this method
-        return null;
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> row : allJobs) {
+            boolean foundInAnyColumn = false;
+
+            for (String column : row.keySet()) {
+                String columnValue = row.get(column);
+
+                if (columnValue != null && columnValue.toLowerCase().contains(value.toLowerCase())) {
+                    foundInAnyColumn = true;
+                    break; // No need to check other columns for the same job
+                }
+            }
+
+            // If the search term was found in any column (case-insensitively), add the job to the result
+            if (foundInAnyColumn) {
+                jobs.add(row);
+            }
+        }
+
+        return jobs;
     }
 
     /**
